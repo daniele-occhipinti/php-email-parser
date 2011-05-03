@@ -25,7 +25,5 @@ Please consider contributing any bug fix fixes or improvements:
 http://www.plancake.com/contact
 
 Plancake homepage: http://www.plancake.com
-Support at: http://www.plancake.com/forums/forum/13/support-for-developers/
-
-
-
+Support: http://www.plancake.com/forums/forum/13/support-for-developers/
+Donations: http://www.plancake.com/donate
