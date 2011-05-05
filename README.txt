@@ -27,3 +27,5 @@ http://www.plancake.com/contact
 Plancake homepage: http://www.plancake.com
 Support: http://www.plancake.com/forums/forum/13/support-for-developers/
 Donations: http://www.plancake.com/donate
+
+"Plancake" and "Plancake Team" are trademarks of Daniele Occhipinti.
