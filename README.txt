@@ -26,14 +26,22 @@ Please contact us if you need any commercial support with the installation of an
 http://www.plancake.com/contact
 
 Please consider contributing with bug fixes or improvements:
-http://www.plancake.com/contact
+dan@plancake.com
 
 Plancake homepage: http://www.plancake.com
 Support: http://www.plancake.com/forums/forum/13/support-for-developers/
 Donations ♥ : http://www.plancake.com/donate
 
 "Plancake" and "Plancake Team" are trademarks of Daniele Occhipinti.
+(by the way, what about using Plancake Team for team collaboration? team.plancake.com)
+
+Brought to you by Danyuki Software Limited, a startup tech company based in London, UK.
 
 
-Happy plancaking! 
-The Plancake team
+
+Happy plancaking!
+
+Daniele Occhipinti
+Director and Founder of Plancake
+email: dan@plancake.com
+skype: dan_plan (I can speak English and Italian)
