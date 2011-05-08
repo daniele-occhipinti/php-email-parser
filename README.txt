@@ -30,6 +30,9 @@ dan@plancake.com
 
 Plancake homepage: http://www.plancake.com
 Support: http://www.plancake.com/forums/forum/13/support-for-developers/
+Subscribe to our blog: http://www.plancake.com/blog
+Follow us on Twitter: http://twitter.com/plancakebakers
+Follow us on Facebook: http://www.facebook.com/plancake
 Donations ♥ : http://www.plancake.com/donate
 
 "Plancake" and "Plancake Team" are trademarks of Daniele Occhipinti.
