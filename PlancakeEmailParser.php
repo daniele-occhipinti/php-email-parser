@@ -59,7 +59,7 @@ class PlancakeEmailParser {
 
     private function extractHeadersAndRawBody()
     {
-        $lines = preg_split("/(\r?\n)/", $this->emailRawContent);
+        $lines = preg_split("/(\r?\n|\r)/", $this->emailRawContent);
 
         $currentHeader = '';
 
