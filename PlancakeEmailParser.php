@@ -7,7 +7,8 @@
 *                                                                                    *
 * Copyright 2009-2010-2011 by:     Danyuki Software Limited                          *
 * Support, News, Updates at:  http://www.plancake.com                                *
-* Licensed under the LGPL version 3 license.                                         *                                                       *
+* Licensed under the LGPL version 3 license.                                         *
+*                                                                                    *
 * Danyuki Software Limited is registered in England and Wales (Company No. 07554549) *
 **************************************************************************************
 * Plancake is distributed in the hope that it will be useful,                        *
@@ -28,6 +29,9 @@
  * @author dan
  */
 class PlancakeEmailParser {
+   
+    private $htmlEncoding;
+    private $plainEncoding;
 
     /**
      *
@@ -53,6 +57,8 @@ class PlancakeEmailParser {
      */
     public function  __construct($emailRawContent) {
         $this->emailRawContent = $emailRawContent;
+        $this->htmlEncoding = null;
+        $this->plainEncoding = null;
 
         $this->extractHeadersAndRawBody();
     }
@@ -72,7 +78,7 @@ class PlancakeEmailParser {
                 $this->rawBodyLines = array_slice($lines, $i);
                 break;
             }
-            
+           
             if ($this->isLineStartingWithPrintableChar($line)) // start of new header
             {
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
@@ -133,7 +139,7 @@ class PlancakeEmailParser {
 
     /**
      * @return string - UTF8 encoded
-     * 
+     *
         --0016e65b5ec22721580487cb20fd
         Content-Type: text/plain; charset=ISO-8859-1
 
@@ -164,7 +170,11 @@ class PlancakeEmailParser {
                     $delimiter = $previousLine;
                 }
             } else if ($detectedContentType && $waitingForContentStart) {
-                if (self::isNewLine($line)) {
+                if(preg_match('/^Content-Transfer-Encoding: (.*)$/', $line, $matches))
+                {
+                    $this->plainEncoding = $matches[1];
+                }
+                else if (self::isNewLine($line)) {
                     $waitingForContentStart = false;
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
@@ -188,7 +198,13 @@ class PlancakeEmailParser {
         // removing trailing new lines
         $plainBody = preg_replace('/((\r?\n)*)$/', '', $plainBody);
 
-        return utf8_encode(quoted_printable_decode($plainBody));
+        switch($this->plainEncoding)
+        {
+            case 'base64':
+                return utf8_encode(base64_decode($plainBody));      
+            default:
+                return utf8_encode(quoted_printable_decode($plainBody));
+        }
     }
 
     /**
@@ -209,7 +225,11 @@ class PlancakeEmailParser {
                     $delimiter = $previousLine;
                 }
             } else if ($detectedContentType && $waitingForContentStart) {
-                if (self::isNewLine($line)) {
+                if(preg_match('/^Content-Transfer-Encoding: (.*)$/', $line, $matches))
+                {
+                    $this->htmlEncoding = $matches[1];
+                }
+                else if (self::isNewLine($line)) {
                     $waitingForContentStart = false;
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
@@ -223,7 +243,15 @@ class PlancakeEmailParser {
             $previousLine = $line;
         }
 
-        return utf8_encode($htmlBody);
+        switch($this->htmlEncoding)
+        {
+            case 'base64':
+                return utf8_encode(base64_decode($htmlBody));
+            case 'quoted-printable':      
+                return utf8_encode(quoted_printable_decode($htmlBody));
+            default:
+                return utf8_encode($htmlBody);
+        }
     }
 
     /**
