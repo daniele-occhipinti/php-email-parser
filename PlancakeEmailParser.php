@@ -106,7 +106,12 @@ class PlancakeEmailParser {
         {
             throw new Exception("Couldn't find the subject of the email");
         }
-        return utf8_encode(iconv_mime_decode($this->rawFields['subject']));
+        $parts = imap_mime_header_decode($this->rawFields['subject']);
+        foreach ($parts as $key => $value) {
+            $text[] = $value->text;
+        }
+        $this->rawFields['subject'] = implode(" ",$text);
+        return utf8_encode($this->rawFields['subject']);
     }
 
     /**
