@@ -7,8 +7,7 @@
 *                                                                                    *
 * Copyright 2009-2010-2011 by:     Danyuki Software Limited                          *
 * Support, News, Updates at:  http://www.plancake.com                                *
-* Licensed under the LGPL version 3 license.                                         *
-*                                                                                    *
+* Licensed under the LGPL version 3 license.                                         *                                                       *
 * Danyuki Software Limited is registered in England and Wales (Company No. 07554549) *
 **************************************************************************************
 * Plancake is distributed in the hope that it will be useful,                        *
@@ -19,7 +18,12 @@
 * You should have received a copy of the GNU Lesser General Public License           *
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.              *
 *                                                                                    *
-**************************************************************************************/
+**************************************************************************************
+*
+* Valuable contributions by:
+* - Chris 
+*
+* **************************************************************************************/
 
 /**
  * Extracts the headers and the body of an email
@@ -29,9 +33,9 @@
  * @author dan
  */
 class PlancakeEmailParser {
-   
-    private $htmlEncoding;
-    private $plainEncoding;
+
+    const PLAINTEXT = 1;
+    const HTML = 2;
 
     /**
      *
@@ -57,8 +61,6 @@ class PlancakeEmailParser {
      */
     public function  __construct($emailRawContent) {
         $this->emailRawContent = $emailRawContent;
-        $this->htmlEncoding = null;
-        $this->plainEncoding = null;
 
         $this->extractHeadersAndRawBody();
     }
@@ -78,7 +80,7 @@ class PlancakeEmailParser {
                 $this->rawBodyLines = array_slice($lines, $i);
                 break;
             }
-           
+            
             if ($this->isLineStartingWithPrintableChar($line)) // start of new header
             {
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
@@ -106,7 +108,16 @@ class PlancakeEmailParser {
         {
             throw new Exception("Couldn't find the subject of the email");
         }
-        return utf8_encode(iconv_mime_decode($this->rawFields['subject']));
+        
+        $subject = iconv_mime_decode($this->rawFields['subject']);
+        
+        if (!preg_match('!!u', $string)) // that is an empty regular expression with u as modifier
+        {
+            // $subject is not UTF-8 yet, so...
+            $subject = utf8_encode($subject);
+        }
+        
+        return $subject;
     }
 
     /**
@@ -138,8 +149,10 @@ class PlancakeEmailParser {
     }
 
     /**
-     * @return string - UTF8 encoded
-     *
+     * return string - UTF8 encoded
+     * 
+     * Example of an email body
+     * 
         --0016e65b5ec22721580487cb20fd
         Content-Type: text/plain; charset=ISO-8859-1
 
@@ -155,26 +168,41 @@ class PlancakeEmailParser {
         --0016e65b5ec22721580487cb20fd
         Content-Type: text/html; charset=ISO-8859-1
      */
-    public function getPlainBody()
+    public function getBody($returnType=self::PLAINTEXT)
     {
         $previousLine = '';
-        $plainBody = '';
+        $body = '';
         $delimiter = '';
         $detectedContentType = false;
+        $contentTransferEncoding = null;
+        $charset = 'ASCII';
         $waitingForContentStart = true;
+
+        if ($returnType == self::HTML)
+            $contentTypeRegex = '/^Content-Type: ?text\/html/i';
+        else
+            $contentTypeRegex = '/^Content-Type: ?text\/plain/i';
 
         foreach ($this->rawBodyLines as $line) {
             if (!$detectedContentType) {
-                if (preg_match('/^Content-Type: ?text\/plain/', $line, $matches)) {
+                
+                if (preg_match($contentTypeRegex, $line, $matches)) {
                     $detectedContentType = true;
+
                     $delimiter = $previousLine;
                 }
+                
+                if(preg_match('/charset=(.*)/i', $line, $matches)) {
+                    $charset = strtoupper(trim($matches[1], '"'));            
+                }       
+                
             } else if ($detectedContentType && $waitingForContentStart) {
-                if(preg_match('/^Content-Transfer-Encoding: (.*)$/', $line, $matches))
-                {
-                    $this->plainEncoding = $matches[1];
-                }
-                else if (self::isNewLine($line)) {
+                
+                if ($contentTransferEncoding == null && preg_match('/^Content-Transfer-Encoding: ?(.*)/i', $line, $matches)) {
+                    $contentTransferEncoding = $matches[1];
+                }                
+                
+                if (self::isNewLine($line)) {
                     $waitingForContentStart = false;
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
@@ -182,7 +210,7 @@ class PlancakeEmailParser {
                 if ($line == $delimiter) {  // found the delimiter
                     break;
                 }
-                $plainBody .= $line . "\n";
+                $body .= $line . "\n";
             }
 
             $previousLine = $line;
@@ -190,21 +218,37 @@ class PlancakeEmailParser {
 
         if (!$detectedContentType)
         {
-            // if here, we missed the text/plain content-type (probably it was)
-            // in the header, thus we assume the whole body is plain text
-            $plainBody = implode("\n", $this->rawBodyLines);
+            // if here, we missed the text/plain content-type (probably it was
+            // in the header), thus we assume the whole body is what we are after
+            $body = implode("\n", $this->rawBodyLines);
         }
 
         // removing trailing new lines
-        $plainBody = preg_replace('/((\r?\n)*)$/', '', $plainBody);
+        $body = preg_replace('/((\r?\n)*)$/', '', $body);
 
-        switch($this->plainEncoding)
-        {
-            case 'base64':
-                return utf8_encode(base64_decode($plainBody));      
-            default:
-                return utf8_encode(quoted_printable_decode($plainBody));
+        if ($contentTransferEncoding == 'base64')
+            $body = base64_decode($body);
+        else if ($contentTransferEncoding == 'quoted-printable')
+            $body = quoted_printable_decode($body);        
+        
+        if($charset != 'UTF-8') {
+            $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
+            
+            if ($body === FALSE) { // iconv returns FALSE on failure
+                $body = utf8_encode($body);
+            }
         }
+
+        return $body;
+    }
+
+    /**
+     * @return string - UTF8 encoded
+     * 
+     */
+    public function getPlainBody()
+    {
+        return $this->getBody(self::PLAINTEXT);
     }
 
     /**
@@ -212,46 +256,7 @@ class PlancakeEmailParser {
      */
     public function getHTMLBody()
     {
-        $previousLine = '';
-        $htmlBody = '';
-        $delimiter = '';
-        $detectedContentType = false;
-        $waitingForContentStart = true;
-
-        foreach ($this->rawBodyLines as $line) {
-            if (!$detectedContentType) {
-                if (preg_match('/^Content-Type: ?text\/html/', $line, $matches)) {
-                    $detectedContentType = true;
-                    $delimiter = $previousLine;
-                }
-            } else if ($detectedContentType && $waitingForContentStart) {
-                if(preg_match('/^Content-Transfer-Encoding: (.*)$/', $line, $matches))
-                {
-                    $this->htmlEncoding = $matches[1];
-                }
-                else if (self::isNewLine($line)) {
-                    $waitingForContentStart = false;
-                }
-            } else {  // ($detectedContentType && !$waitingForContentStart)
-                // collecting the actual content until we find the delimiter
-                if ($line == $delimiter) {  // found the delimiter
-                    break;
-                }
-                $htmlBody .= $line . "\n";
-            }
-
-            $previousLine = $line;
-        }
-
-        switch($this->htmlEncoding)
-        {
-            case 'base64':
-                return utf8_encode(base64_decode($htmlBody));
-            case 'quoted-printable':      
-                return utf8_encode(quoted_printable_decode($htmlBody));
-            default:
-                return utf8_encode($htmlBody);
-        }
+        return $this->getBody(self::HTML);
     }
 
     /**
