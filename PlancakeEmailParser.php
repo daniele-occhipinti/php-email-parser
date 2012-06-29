@@ -108,16 +108,7 @@ class PlancakeEmailParser {
         {
             throw new Exception("Couldn't find the subject of the email");
         }
-        
-        $subject = iconv_mime_decode($this->rawFields['subject']);
-        
-        if (!preg_match('!!u', $string)) // that is an empty regular expression with u as modifier
-        {
-            // $subject is not UTF-8 yet, so...
-            $subject = utf8_encode($subject);
-        }
-        
-        return $subject;
+        return utf8_encode(iconv_mime_decode($this->rawFields['subject']));
     }
 
     /**
