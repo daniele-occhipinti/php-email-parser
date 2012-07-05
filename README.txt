@@ -5,14 +5,16 @@ This library allows you to easily parse an email given its content (headers + bo
 Usage example:
 
 
-
 $emailPath = "/var/mail/spool/dan/new/12323344323234234234";
 $emailParser = new PlancakeEmailParser(file_get_contents($emailPath));
 
+// You can use some predefined methods to retrieve headers...
 $emailTo = $emailParser->getTo();
 $emailSubject = $emailParser->getSubject();
 $emailCc = $emailParser->getCc();
+// ... or you can use the 'general purpose' method getHeader()
 $emailDeliveredToHeader = $emailParser->getHeader('Delivered-To');
+
 $emailBody = $emailParser->getPlainBody();
 
 
