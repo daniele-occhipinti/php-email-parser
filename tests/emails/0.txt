@@ -1,0 +1,68 @@
+Delivered-To: dan@test.com
+Received: by 10.76.34.137 with SMTP id z9csp136640oai;
+        Tue, 28 Aug 2012 02:40:28 -0700 (PDT)
+Received: by 10.68.234.6 with SMTP id ua6mr41487056pbc.117.1346146817853;
+        Tue, 28 Aug 2012 02:40:17 -0700 (PDT)
+Return-Path: <pawel@test.com>
+Received: from xxxxx-asmtp001.mac.com (xxxxx-asmtp001.mac.com. [17.157.161.0])
+        by mx.google.com with ESMTP id qs7si36267775pbc.282.2012.08.28.02.40.16;
+        Tue, 28 Aug 2012 02:40:17 -0700 (PDT)
+Received-SPF: pass (google.com: domain of pawel@test.com designates 17.157.161.0 as permitted sender) client-ip=17.157.161.0;
+Authentication-Results: mx.google.com; spf=pass (google.com: domain of pawel@test.com designates 17.157.161.0 as permitted sender) smtp.mail=pawel@test.com
+MIME-version: 1.0
+Content-type: multipart/mixed; boundary="Boundary_(ID_HBjaZsKd/JYCOBj0NwKdIg)"
+Received: from pc-Pawel.local
+ (84-10-143-154.dynamic.chello.pl [84.10.143.154])
+ by xxxxx-asmtp001.mac.com
+ (Oracle Communications Messaging Server 7u4-23.01(7.0.4.23.0) 64bit (built Aug
+ 10 2011)) with ESMTPSA id <0M9G00J3KLJ0E470@xxxxx-asmtp001.mac.com> for
+ dan@test.com; Tue, 28 Aug 2012 09:40:16 +0000 (GMT)
+X-Proofpoint-Virus-Version: vendor=fsecure
+ engine=2.50.10432:5.7.7855,1.0.428,0.0.0000
+ definitions=2012-08-28_02:2012-08-28,2012-08-27,1970-01-01 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ ipscore=0 suspectscore=4 phishscore=0 bulkscore=0 adultscore=0 classifier=spam
+ adjust=0 reason=mlx scancount=1 engine=6.0.2-1203120001
+ definitions=main-1208280046
+Message-id: <503C91FA.8000908@me.com>
+Date: Tue, 28 Aug 2012 11:40:10 +0200
+From: Pawel <pawel@test.com>
+User-Agent: Postbox 3.0.5 (Macintosh/20120826)
+To: dan@test.com
+Subject: =?UTF-8?B?emHFvMOzxYLEhyBnxJnFm2zEhSBqYcW6xYQgaSB6csOzYiBwcsOzYm4=?=
+ =?UTF-8?B?ZSB6YWRhbmllICUldG9k?=
+
+This is a multi-part message in MIME format.
+
+--Boundary_(ID_HBjaZsKd/JYCOBj0NwKdIg)
+Content-type: multipart/alternative;
+ boundary="Boundary_(ID_IwJgqMZPSLzwxvKroSd+xg)"
+
+
+--Boundary_(ID_IwJgqMZPSLzwxvKroSd+xg)
+Content-type: text/plain; CHARSET=US-ASCII; format=flowed
+Content-transfer-encoding: 7BIT
+
+This is a nonesense test-email to check Plancake Mail to Inbox feature. 
+All Polish diacritics included ;-) tag also included for additional tests.
+It should look like in the picture attached.
+Best regards
+Pawel
+
+--Boundary_(ID_IwJgqMZPSLzwxvKroSd+xg)
+Content-type: text/html; CHARSET=US-ASCII
+Content-transfer-encoding: 7BIT
+
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body
+ style="font-family: tt; font-size: 10pt;" bgcolor="#FFFFFF" 
+text="#000000">
+<div style="font-size: 10pt;font-family: tt;"><span style="font-family: 
+monospace;">This is a nonesense test-email to check Plancake Mail to 
+Inbox feature. All Polish diacritics included ;-) tag also included for 
+additional tests.<br>It should look like in the picture attached.<br>Best
+ regards<br>Pawel<br></span></div>
+</body>
+</html>
+
+--Boundary_(ID_IwJgqMZPSLzwxvKroSd+xg)--

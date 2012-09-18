@@ -30,6 +30,12 @@
  * Obviously it can't extract the bcc header because it doesn't appear in the content
  * of the email.
  *
+ * N.B.: if you deal with non-English languages, we recommend you install the IMAP PHP extension:
+ * the Plancake PHP Email Parser will detect it and used it automatically for better results.
+ * 
+ * For more info, check:
+ * https://github.com/plancake/official-library-php-email-parser
+ * 
  * @author dan
  */
 class PlancakeEmailParser {
@@ -37,6 +43,12 @@ class PlancakeEmailParser {
     const PLAINTEXT = 1;
     const HTML = 2;
 
+    /**
+     *
+     * @var boolean
+     */    
+    private $isImapExtensionAvailable = false;
+    
     /**
      *
      * @var string
@@ -63,6 +75,10 @@ class PlancakeEmailParser {
         $this->emailRawContent = $emailRawContent;
 
         $this->extractHeadersAndRawBody();
+        
+        if (function_exists('imap_open')) {
+            $this->isImapExtensionAvailable = true;
+        }
     }
 
     private function extractHeadersAndRawBody()
@@ -91,7 +107,9 @@ class PlancakeEmailParser {
             }
             else // more lines related to the current header
             {
-                $this->rawFields[$currentHeader] .= substr($line, 1);
+                if ($currentHeader) { // to prevent notice from empty lines
+                    $this->rawFields[$currentHeader] .= substr($line, 1);
+                }
             }
             $i++;
         }
@@ -108,7 +126,18 @@ class PlancakeEmailParser {
         {
             throw new Exception("Couldn't find the subject of the email");
         }
-        return utf8_encode(iconv_mime_decode($this->rawFields['subject']));
+        
+        $ret = '';
+        
+        if ($this->isImapExtensionAvailable) {
+            $h = imap_mime_header_decode($this->rawFields['subject']);
+            $charset = ($h[0]->charset == 'default') ? 'US-ASCII' : $h[0]->charset;
+            return iconv($charset, "UTF-8//TRANSLIT", $h[0]->text);            
+        } else {
+            $ret = utf8_encode(iconv_mime_decode($this->rawFields['subject']));
+        }
+        
+        return $ret;
     }
 
     /**
@@ -223,6 +252,10 @@ class PlancakeEmailParser {
             $body = quoted_printable_decode($body);        
         
         if($charset != 'UTF-8') {
+            // FORMAT=FLOWED, despite being popular in emails, it is not
+            // supported by iconv
+            $charset = str_replace("FORMAT=FLOWED", "", $charset);
+            
             $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
             
             if ($body === FALSE) { // iconv returns FALSE on failure

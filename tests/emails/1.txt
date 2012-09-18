@@ -1,0 +1,50 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: daniele@test.com
+Received: by 10.114.17.33 with SMTP id l1csp3122ldd;
+        Tue, 18 Sep 2012 02:41:44 -0700 (PDT)
+Received: by 10.58.239.232 with SMTP id vv8mr9429162vec.37.1347961303872;
+        Tue, 18 Sep 2012 02:41:43 -0700 (PDT)
+Return-Path: <dan@test.com>
+Received: from mail-vb0-f50.google.com (mail-vb0-f50.google.com [209.85.212.50])
+        by mx.google.com with ESMTPS id l6si7688147vcq.72.2012.09.18.02.41.43
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Tue, 18 Sep 2012 02:41:43 -0700 (PDT)
+Received-SPF: neutral (google.com: 209.85.212.50 is neither permitted nor denied by best guess record for domain of dan@test.com) client-ip=209.85.212.50;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 209.85.212.50 is neither permitted nor denied by best guess record for domain of dan@test.com) smtp.mail=dan@test.com
+Received: by mail-vb0-f50.google.com with SMTP id l22so8808870vbn.9
+        for <daniele@test.com>; Tue, 18 Sep 2012 02:41:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20120113;
+        h=mime-version:x-originating-ip:from:date:message-id:subject:to
+         :content-type:x-gm-message-state;
+        bh=PspmOkExwaKjIUREisshzexR2oetA5uzuTOojKs40T0=;
+        b=c4Gqdb/v+bU+oDTpZhBBWcx+NMkKhesUWzEkXvJkMNePD7EEvc3/rMcrSoy4+I+8RR
+         gr3dfPEEdqZ769R3YFJ4xr3P5df1vxQhPfdanOpA7L2PwtRGBjXgLAZKENM9erZKmkdQ
+         q+uXwOYNLtNuF5kDKGX8TvC6AP2PUAlcKvIduGoJ30inP/noD0batOmI9BpDNT8NIFAK
+         ldnVuLB7Iy6aJK0REQQA5beFOm2xPvnqTVPYbD89xDjpjRIrCQ/hhM7pWmYPPHMoju7t
+         aeYSgvs5pv3Tfp0lMb5yBXIYp/WS6r80pElbjozctMs3TrEEKRbLdGKGc2t9Q9EIhRul
+         AfsQ==
+Received: by 10.52.36.34 with SMTP id n2mr4808159vdj.105.1347961302979; Tue,
+ 18 Sep 2012 02:41:42 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 10.58.222.103 with HTTP; Tue, 18 Sep 2012 02:41:22 -0700 (PDT)
+X-Originating-IP: [109.158.215.220]
+From: "Dan @ Test.com" <dan@test.com>
+Date: Tue, 18 Sep 2012 10:41:22 +0100
+Message-ID: <CACm7M_MmT14Q-DQjEQqH8Xv_JQsbrnGA4OwfXjkN0LoE_BWE_w@mail.test.com>
+Subject: this is a test
+To: Daniele  <danielet@test.com>
+Content-Type: multipart/alternative; boundary=20cf307f398ea295d904c9f6b2a6
+X-Gm-Message-State: ALoCoQlh01kch4ywUSwY0xXJAZx7DW352l9t4+rs/FsY2P46f3kTi0FiEekDb37jju+fr0rhOr+3
+
+--20cf307f398ea295d904c9f6b2a6
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hope it works!
+
+--20cf307f398ea295d904c9f6b2a6
+Content-Type: text/html; charset=ISO-8859-1
+
+Hope it works!<br><div title="signature"> </div>
+
+--20cf307f398ea295d904c9f6b2a6--

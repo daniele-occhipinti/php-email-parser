@@ -1,0 +1,52 @@
+                                                                                                                                                                                                                                                               
+Delivered-To: daniele@test.com
+Received: by 10.114.17.33 with SMTP id l1csp4056ldd;
+        Tue, 18 Sep 2012 03:26:33 -0700 (PDT)
+Received: by 10.221.1.137 with SMTP id nq9mr9146920vcb.16.1347963992703;
+        Tue, 18 Sep 2012 03:26:32 -0700 (PDT)
+Return-Path: <dan@test.com>
+Received: from mail-vb0-f46.google.com (mail-vb0-f46.google.com [209.85.212.46])
+        by mx.google.com with ESMTPS id nr9si7739478vcb.47.2012.09.18.03.26.31
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Tue, 18 Sep 2012 03:26:32 -0700 (PDT)
+Received-SPF: neutral (google.com: 209.85.212.46 is neither permitted nor denied by best guess record for domain of dan@test.com) client-ip=209.85.212.46;
+Authentication-Results: mx.google.com; spf=neutral (google.com: 209.85.212.46 is neither permitted nor denied by best guess record for domain of dan@test.com) smtp.mail=dan@test.com
+Received: by mail-vb0-f46.google.com with SMTP id ff1so4097773vbb.19
+        for <daniele@test.com>; Tue, 18 Sep 2012 03:26:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20120113;
+        h=mime-version:x-originating-ip:from:date:message-id:subject:to
+         :content-type:x-gm-message-state;
+        bh=AkxZ77/pitG59A/NWKlbLstrhunK6KXfB2fNB4YSalk=;
+        b=bhfvZKO9bbkr4akjdJ5vaot480TiITsjBMdjtxCMAg4RPnoed6IsivejP9cJZcIIPq
+         N0O2CaPv1z9DyT4DXlPYJTAMUSvHg8KWZIUp7rfKZ0X7Y9OWWIHkIaApqfMpM61OF0qo
+         wbCG7boJ2fbtdDPZQ3z+LamDKAChU7ayuplQYN0vMqkpRlYw9YLnM6BOO4Yj66TZ8q6M
+         WAVdM1kFVP+r2QGd7ka3UWM55Ah9R9dg2SRmBN3W6EBV91IVWw4DQ9Ufucr65YnCU/GA
+         qe3AuaeHf0Th2CnMn/mlMbeEm+vG3WD+G3ZQ8+UpKkDFdN4GlrB3JnnDc6AV3o4weske
+         tYQA==
+Received: by 10.58.65.40 with SMTP id u8mr9411987ves.47.1347963991825; Tue, 18
+ Sep 2012 03:26:31 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 10.58.222.103 with HTTP; Tue, 18 Sep 2012 03:26:11 -0700 (PDT)
+X-Originating-IP: [109.158.215.220]
+From: "Dan" <dan@test.com>
+Date: Tue, 18 Sep 2012 11:26:11 +0100
+Message-ID: <CACm7M_MSh=SkFBnW2t0s6d_rH1e3ntcauoWd2jAO55hwidXEfA@mail.test.com>
+Subject: =?ISO-2022-JP?B?GyRCJDMkbCRPJUYlOSVIJEckORsoQg==?=
+To: Daniele <daniele@test.com>
+Content-Type: multipart/alternative; boundary=047d7b6d8564e71cac04c9f75290
+X-Gm-Message-State: ALoCoQlwrVoZ6rkTcekymixxwzWXjBHxmM0yFX4xQ/t74eEEfsoU2nSbGLhgaz8HYimU8WeCI7ll
+
+--047d7b6d8564e71cac04c9f75290
+Content-Type: text/plain; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
+
+それは作品を期待
+
+--047d7b6d8564e71cac04c9f75290
+Content-Type: text/html; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
+
+それは作品を期待<div title="signature"> </div>
+
+--047d7b6d8564e71cac04c9f75290--

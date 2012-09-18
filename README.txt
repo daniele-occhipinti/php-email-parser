@@ -1,5 +1,8 @@
 *** PLANCAKE PHP EMAIL PARSER ***
 
+N.B.: if you deal with non-English languages, we recommend you install the IMAP PHP extension:
+the Plancake PHP Email Parser will detect it and used it automatically for better results.
+
 This library allows you to easily parse an email given its content (headers + body).
 
 Usage example:
@@ -17,6 +20,8 @@ $emailDeliveredToHeader = $emailParser->getHeader('Delivered-To');
 
 $emailBody = $emailParser->getPlainBody();
 
+For more info:
+https://github.com/plancake/official-library-php-email-parser
 
 -----------------------------------------
 
