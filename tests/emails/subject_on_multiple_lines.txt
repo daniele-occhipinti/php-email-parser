@@ -1,0 +1,25 @@
+Return-Path: <info@domain.it>
+Delivered-To: bounce@domain-bounce.it
+Received: from h0.host.net (HELO queue) (123.123.33.50)
+	by h0.host.net with SMTP; 10 May 2012 16:41:46 +0200
+Received: from mx.aruba.it (321.321.157.29)
+  by mx.host.net with SMTP; 10 May 2012 16:41:44 +0200
+Received: (qmail 11142 invoked by uid 89); 10 May 2012 14:41:43 -0000
+Date: 10 May 2012 14:41:43 -0000
+Message-ID: <1336660903.11137.blah@host.it>
+Delivered-To: Autoresponder
+To: bounce@domain-bounce.it
+From: info@domain.it
+Subject: Re: =?UTF-8?Q?Testo=20Del=20di=20Soggetto=20Che=20?=
+	=?UTF-8?Q?Va=20A=20Capo=20In=20UTF8=20?=
+X-Spam-Check: DONE|U 0.500569/N
+X-Spam-Check: OK
+
+
+
+Da: info@domain.it
+Oggetto: Grazie!!!
+
+Sarà contattato al più presto
+Nome Cognome
+
