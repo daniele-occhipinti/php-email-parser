@@ -130,9 +130,10 @@ class PlancakeEmailParser {
         $ret = '';
         
         if ($this->isImapExtensionAvailable) {
-            $h = imap_mime_header_decode($this->rawFields['subject']);
-            $charset = ($h[0]->charset == 'default') ? 'US-ASCII' : $h[0]->charset;
-            return iconv($charset, "UTF-8//TRANSLIT", $h[0]->text);            
+            foreach (imap_mime_header_decode($this->rawFields['subject']) as $h) { // subject can span into several lines
+                $charset = ($h->charset == 'default') ? 'US-ASCII' : $h->charset;
+                $ret .=  iconv($charset, "UTF-8//TRANSLIT", $h->text);
+            }
         } else {
             $ret = utf8_encode(iconv_mime_decode($this->rawFields['subject']));
         }
@@ -190,9 +191,7 @@ class PlancakeEmailParser {
      */
     public function getBody($returnType=self::PLAINTEXT)
     {
-        $previousLine = '';
         $body = '';
-        $delimiter = '';
         $detectedContentType = false;
         $contentTransferEncoding = null;
         $charset = 'ASCII';
@@ -202,21 +201,31 @@ class PlancakeEmailParser {
             $contentTypeRegex = '/^Content-Type: ?text\/html/i';
         else
             $contentTypeRegex = '/^Content-Type: ?text\/plain/i';
-
+        
+        // there could be more than one boundary
+        preg_match_all('!boundary=(.*)$!mi', $this->emailRawContent, $matches);
+        $boundaries = $matches[1];
+        // sometimes boundaries are delimited by quotes - we want to remove them
+        foreach($boundaries as $i => $v) {
+            $boundaries[$i] = str_replace(array("'", '"'), '', $v);
+        }
+        
         foreach ($this->rawBodyLines as $line) {
             if (!$detectedContentType) {
                 
                 if (preg_match($contentTypeRegex, $line, $matches)) {
                     $detectedContentType = true;
-
-                    $delimiter = $previousLine;
                 }
                 
                 if(preg_match('/charset=(.*)/i', $line, $matches)) {
-                    $charset = strtoupper(trim($matches[1], '"'));            
+                    $charset = strtoupper(trim($matches[1], '"')); 
                 }       
                 
             } else if ($detectedContentType && $waitingForContentStart) {
+                
+                if(preg_match('/charset=(.*)/i', $line, $matches)) {
+                    $charset = strtoupper(trim($matches[1], '"')); 
+                }                 
                 
                 if ($contentTransferEncoding == null && preg_match('/^Content-Transfer-Encoding: ?(.*)/i', $line, $matches)) {
                     $contentTransferEncoding = $matches[1];
@@ -227,13 +236,15 @@ class PlancakeEmailParser {
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
                 // collecting the actual content until we find the delimiter
-                if ($line == $delimiter) {  // found the delimiter
-                    break;
+                
+                // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
+                if (is_array($boundaries)) {
+                    if (in_array(substr($line, 2), $boundaries)) {  // found the delimiter
+                        break;
+                    }
                 }
                 $body .= $line . "\n";
             }
-
-            $previousLine = $line;
         }
 
         if (!$detectedContentType)
