@@ -249,6 +249,18 @@ class PlancakeEmailParser {
 
         if (!$detectedContentType)
         {
+            // check if contentTransferEncoding was set -> if not, read its value from header
+            if (!$contentTransferEncoding) {
+                $contentTransferEncoding = $this->rawFields['content-transfer-encoding'];
+            }
+
+            // check if charset was set in header -> if not, use deafult (as already set in $charset)
+            preg_match('/charset=(.*)/i',  $this->rawFields['content-type'], $matches);
+            $charsetFromHeader = strtoupper(trim($matches[1], '"'));
+            if ($charsetFromHeader) {
+                $charset = $charsetFromHeader;
+            }
+
             // if here, we missed the text/plain content-type (probably it was
             // in the header), thus we assume the whole body is what we are after
             $body = implode("\n", $this->rawBodyLines);
@@ -262,16 +274,18 @@ class PlancakeEmailParser {
         else if ($contentTransferEncoding == 'quoted-printable')
             $body = quoted_printable_decode($body);        
         
-        if($charset != 'UTF-8') {
+        if ($charset != 'UTF-8') {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
             $charset = str_replace("FORMAT=FLOWED", "", $charset);
             
-            $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
-            
-            if ($body === FALSE) { // iconv returns FALSE on failure
-                $body = utf8_encode($body);
+            $iconvBody = iconv($charset, 'UTF-8//TRANSLIT', $body);
+
+            if ($iconvBody === FALSE) { // iconv returns FALSE on failure
+                return utf8_encode($body);
             }
+
+            return $iconvBody;
         }
 
         return $body;
