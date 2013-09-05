@@ -266,11 +266,12 @@ class PlancakeEmailParser {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
             $charset = str_replace("FORMAT=FLOWED", "", $charset);
-            
+           
+	    $bodyCopy = $body; 
             $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
             
             if ($body === FALSE) { // iconv returns FALSE on failure
-                $body = utf8_encode($body);
+                $body = utf8_encode($bodyCopy);
             }
         }
 
