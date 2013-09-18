@@ -38,7 +38,8 @@
  * 
  * @author dan
  */
-class PlancakeEmailParser {
+class PlancakeEmailParser 
+{
 
     const PLAINTEXT = 1;
     const HTML = 2;
@@ -86,32 +87,24 @@ class PlancakeEmailParser {
         $lines = preg_split("/(\r?\n|\r)/", $this->emailRawContent);
 
         $currentHeader = '';
-
-        $i = 0;
-        foreach ($lines as $line)
-        {
-            if(self::isNewLine($line))
-            {
+        foreach ($lines as $i => $line) {
+            if(self::isNewLine($line)) {
                 // end of headers
                 $this->rawBodyLines = array_slice($lines, $i);
                 break;
             }
             
-            if ($this->isLineStartingWithPrintableChar($line)) // start of new header
-            {
+            if ($this->isLineStartingWithPrintableChar($line)) { // start of new header
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
                 $newHeader = strtolower($matches[1]);
                 $value = $matches[2];
                 $this->rawFields[$newHeader] = $value;
                 $currentHeader = $newHeader;
-            }
-            else // more lines related to the current header
-            {
+            } else { // more lines related to the current header
                 if ($currentHeader) { // to prevent notice from empty lines
                     $this->rawFields[$currentHeader] .= substr($line, 1);
                 }
             }
-            $i++;
         }
     }
 
@@ -122,13 +115,11 @@ class PlancakeEmailParser {
      */
     public function getSubject()
     {
-        if (!isset($this->rawFields['subject']))
-        {
+        if (!isset($this->rawFields['subject'])) {
             throw new Exception("Couldn't find the subject of the email");
         }
         
         $ret = '';
-        
         if ($this->isImapExtensionAvailable) {
             foreach (imap_mime_header_decode($this->rawFields['subject']) as $h) { // subject can span into several lines
                 $charset = ($h->charset == 'default') ? 'US-ASCII' : $h->charset;
@@ -147,12 +138,7 @@ class PlancakeEmailParser {
      */
     public function getCc()
     {
-        if (!isset($this->rawFields['cc']))
-        {
-            return array();
-        }
-
-        return explode(',', $this->rawFields['cc']);
+        return isset($this->rawFields['cc']) ? explode(',', $this->rawFields['cc']) : array();
     }
 
     /**
@@ -162,10 +148,10 @@ class PlancakeEmailParser {
      */
     public function getTo()
     {
-        if ( (!isset($this->rawFields['to'])) || (!count($this->rawFields['to'])))
-        {
+        if (!isset($this->rawFields['to']) || !count($this->rawFields['to'])) {
             throw new Exception("Couldn't find the recipients of the email");
         }
+        
         return explode(',', $this->rawFields['to']);
     }
 
@@ -238,17 +224,16 @@ class PlancakeEmailParser {
                 // collecting the actual content until we find the delimiter
                 
                 // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
-                if (is_array($boundaries)) {
-                    if (in_array(substr($line, 2), $boundaries)) {  // found the delimiter
+                if (is_array($boundaries) && in_array(substr($line, 2), $boundaries)) {
+			// found the delimiter
                         break;
                     }
-                }
+                    
                 $body .= $line . "\n";
             }
         }
 
-        if (!$detectedContentType)
-        {
+        if (!$detectedContentType) {
             // if here, we missed the text/plain content-type (probably it was
             // in the header), thus we assume the whole body is what we are after
             $body = implode("\n", $this->rawBodyLines);
@@ -257,12 +242,13 @@ class PlancakeEmailParser {
         // removing trailing new lines
         $body = preg_replace('/((\r?\n)*)$/', '', $body);
 
-        if ($contentTransferEncoding == 'base64')
-            $body = base64_decode($body);
-        else if ($contentTransferEncoding == 'quoted-printable')
-            $body = quoted_printable_decode($body);        
+        if ($contentTransferEncoding == 'base64') {
+        	$body = base64_decode($body);
+        } else if ($contentTransferEncoding == 'quoted-printable') {
+        	$body = quoted_printable_decode($body);        	
+        }
         
-        if($charset != 'UTF-8') {
+        if ($charset != 'UTF-8') {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
             $charset = str_replace("FORMAT=FLOWED", "", $charset);
@@ -270,7 +256,7 @@ class PlancakeEmailParser {
 	    $bodyCopy = $body; 
             $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
             
-            if ($body === FALSE) { // iconv returns FALSE on failure
+            if ($body === false) { // iconv returns FALSE on failure
                 $body = utf8_encode($bodyCopy);
             }
         }
@@ -305,11 +291,7 @@ class PlancakeEmailParser {
     {
         $headerName = strtolower($headerName);
 
-        if (isset($this->rawFields[$headerName]))
-        {
-            return $this->rawFields[$headerName];
-        }
-        return '';
+        return isset($this->rawFields[$headerName]) ? return $this->rawFields[$headerName] : '';
     }
 
     /**
@@ -322,7 +304,7 @@ class PlancakeEmailParser {
         $line = str_replace("\r", '', $line);
         $line = str_replace("\n", '', $line);
 
-        return (strlen($line) === 0);
+        return strlen($line) === 0;
     }
 
     /**
@@ -335,4 +317,3 @@ class PlancakeEmailParser {
         return preg_match('/^[A-Za-z]/', $line);
     }
 }
-?>
