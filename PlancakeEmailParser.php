@@ -102,17 +102,34 @@ class PlancakeEmailParser {
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
                 $newHeader = strtolower($matches[1]);
                 $value = $matches[2];
-                $this->rawFields[$newHeader] = $value;
+		        if (is_array($this->rawFields[$newHeader]))
+                    $this->rawFields[$newHeader][] = $value;
+                else if (isset($this->rawFields[$newHeader]))
+                    $this->rawFields[$newHeader] = array($this->rawFields[$newHeader], $value);
+                else
+                    $this->rawFields[$newHeader] = $value;
                 $currentHeader = $newHeader;
             }
             else // more lines related to the current header
             {
                 if ($currentHeader) { // to prevent notice from empty lines
-                    $this->rawFields[$currentHeader] .= substr($line, 1);
+        			if (is_array($this->rawFields[$currentHeader])) {
+        				$this->rawFields[$currentHeader][count($this->rawFields[$currentHeader]) - 1] .= substr($line, 1);
+        			} else {
+                        $this->rawFields[$currentHeader] .= substr($line, 1);
+        			}
                 }
             }
             $i++;
         }
+    }
+    
+    /**
+     * @return array the parsed headers as associative array
+     */
+    public function getHeaders()
+    {
+        return $this->rawFields;
     }
 
     /**
