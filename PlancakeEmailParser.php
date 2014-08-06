@@ -170,6 +170,35 @@ class PlancakeEmailParser {
     }
 
     /**
+     * Get the address the email was sent from.
+     *
+     * @return array
+     *   An associative array with the keys 'name' and 'email'.
+     *   The name is not always provided by legitimate senders.
+     *
+     * @throws Exception if a to header is not found or is empty.
+     */
+    public function getFrom()
+    {
+        if (empty($this->rawFields['from'])) {
+            throw new Exception("Couldn't find a from address in the email");
+        }
+        $matches = null;
+        preg_match('/(.*)<(.*)>/', $this->rawFields['from'], $matches);
+        if (count($matches) == 3) {
+            return array(
+                'name' => $matches[1],
+                'email' => $matches[2],
+            );
+        } else {
+            return array(
+                'name' => '',
+                'email' => $this->rawFields['from'],
+            );
+        }
+    }
+
+    /**
      * return string - UTF8 encoded
      * 
      * Example of an email body
