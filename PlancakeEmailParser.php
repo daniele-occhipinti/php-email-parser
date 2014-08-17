@@ -47,7 +47,7 @@ class PlancakeEmailParser {
      *
      * @var boolean
      */    
-    private $isImapExtensionAvailable = false;
+    private $isImapExtensionAvailable;
     
     /**
      *
@@ -76,9 +76,7 @@ class PlancakeEmailParser {
 
         $this->extractHeadersAndRawBody();
         
-        if (function_exists('imap_open')) {
-            $this->isImapExtensionAvailable = true;
-        }
+        $this->isImapExtensionAvailable = function_exists('imap_open');
     }
 
     private function extractHeadersAndRawBody()
