@@ -38,6 +38,21 @@
  * 
  * @author dan
  */
+ /** 
+    * Contributions:
+	*
+    * Reads Attachments from email and processes it.
+	*
+	* 1. getFrom() : get email address.
+    * 2. detectAttachments() : detects attachments from email body. This is automatically called. We donot need to call them.
+    * 3. countAttachments() : returns counts number of attachments.
+    * 4. getAttachmentArrayJ() : returns lists of attacments in json format.
+    * 5. getAttachmentArray() : returns lists of attachments in php array format.
+    *
+    *  (Attachments with Emails has been tested with outlook, hotmail, gmail, apple mail.)
+    *
+    *@author Sourja T Banerjee
+ */
 class PlancakeEmailParser {
 
     const PLAINTEXT = 1;
@@ -320,7 +335,6 @@ class PlancakeEmailParser {
     private function extractHeadersAndRawBody()
     {
         $lines = preg_split("/(\r?\n|\r)/", $this->emailRawContent);
-        //echo $this->emailRawContent.'<hr/>';
         $currentHeader = '';
 
         $i = 0;
