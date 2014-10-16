@@ -42,7 +42,9 @@ class PlancakeEmailParser {
 
     const PLAINTEXT = 1;
     const HTML = 2;
-
+    public $hasAttachments = -1;
+    private $boundary = ''; //Unique Boundary for multipart emails
+    private $attachments = array(); //Attachments Array
     /**
      *
      * @var boolean
@@ -75,21 +77,256 @@ class PlancakeEmailParser {
         $this->emailRawContent = $emailRawContent;
 
         $this->extractHeadersAndRawBody();
-        
+        $this->detectAttachments();
         if (function_exists('imap_open')) {
             $this->isImapExtensionAvailable = true;
         }
     }
+    public function countAttachments() //Returns Attachments Count
+    {
+      return count($this->attachments); //counts number of Attachments
+    }
+	
+	/*
+	  Returns Attachment array:
+	
+	   Array([0] => Array ( [file_encoding] => base64
+                               [file_type] => audio/caf 
+							   [file_d_type] => attachment 
+							   [file_name] => example_vmr_09102012182307.3gp 
+							   [file_content] => Y2FmZgA) Array(...))
+	*/
+	
+	public function getAttachmentArrayJ() //Attachment array in JSON format
+	{
+	  return json_encode($this->attachments);
+	}
+	
+	/*
+	  Returns Attachment array:
+	
+	   [{"file_type":"text\/plain","file_d_type":"attachment","file_name":"text.txt","file_encoding":"base64","file_content":"dGVTVGluZyA="},
+	   {...}]
+	*/
+	
+	public function getAttachmentArray() //Attachment in PHP array 
+	{
+	  return $this->attachments;
+	}
+	
+    public function detectAttachments() //Attachments Detection and fills up array.
+    {
+      $contentTypeRegex = '/^Content-Type: ?multipart\/mixed\;/i'; 
+      $lines = preg_split("/(\r?\n|\r)/", $this->emailRawContent);
+      $boundary_0 = 0;
+      $boundary_1 ='';
+      $line_0 = 0;
+      $line_1 = '';
+      $line_2 = '';
+      $line_3 = '';
+      $line_4 = 0;
+      $line_5 = 0;
+      $line_6 = '';
+      $line_7 = '';
+      $tmp = array();
+      foreach ($lines as $line)
+        {
+           //echo $line.'<br/>';
+           
+            if(preg_match($contentTypeRegex, $line, $matches, PREG_OFFSET_CAPTURE))
+            {
+              $this->hasAttachments = 1;
+              $boundary_0 = 1;
+            }
+            
+            if($boundary_0 == 1 )
+            {
+              if(strpos($line, 'boundary=')!==false)
+              {
+                $pos = strpos($line, 'boundary=');
+                $boundary_1 = substr($line,$pos+9);
+                $boundary_1 = preg_replace("/\"/","",$boundary_1);
+                //echo 'boundary: '.$boundary_1.' <br/>';
+                $this->boundary = $boundary_1;
+                $boundary_0=0;
+                continue;
+              }
+            }
+           
+        
+          
+           if($boundary_1 != '')           
+           {
+            
+            //preg_match('/($boundary_1)/', $line, $matches, PREG_OFFSET_CAPTURE);
+            
+            if(strpos($line,'--'.$boundary_1)!==false  )
+            {
+             //print_r($matches);
+             //echo $line; 
+              if($line_0 == 5)
+              {
+               $tmp['file_content'] = $line_6; 
+               array_push($this->attachments,$tmp);
+               $tmp = array();
+              }
+              
+              $line_0 = 1;
+              $line_1 = $line_2 = $line_3 = $line_4 = 0;
+              continue;
+            }
+           }
+          
+          if($line_7 == 1)
+          {
+          if(strpos($line,'filename=')!==false)
+          {
+            $line_1 = substr($line,strpos($line,'filename=')+9);
+            $tmp['file_name'] = preg_replace("/\"/","",$line_1); 
+          }
+          $line_7 = 0;
+          } 
+          
+          if($line_0 != 0)
+          {
+            switch($line_0)
+            {
+              case 1:
+               $line_1 = $line; 
+               //echo $line_1.'<br/>';
+               if(strpos($line,'Content-Type:')!==false )
+               {
+                 $line_1 = substr($line,strpos($line,'Content-Type:')+13);
+                 $line_1 = explode(";",$line_1);
+                 if(strpos(trim($line_1[0]),'multipart/alternative')===false){ 
+                    $tmp['file_type'] = trim($line_1[0]);
+                    //echo trim($line_1[0]);
+                     $line_0 = 2;
+                 }//cancels the 'multipart/alternative' test
+               } 
+               else  if(strpos($line,'Content-Disposition:')!==false)
+               {
+                 $line_1 = substr($line,strpos($line,'Content-Disposition:')+20); 
+                 $line_1 = explode(";",$line_1); 
+                 if(trim($line_1[1])=='') //if there is a space between content-disposition and filename
+                   $line_7=1;
+                   $tmp['file_d_type'] = trim($line_1[0]); //echo trim($line_2[0]);
+                   $line_1 = substr($line_1[1],strpos($line_1[1],'filename=')+9);
+                   $tmp['file_name'] = preg_replace("/\"/","",$line_1); 
+                   $line_0 = 2;
+               }
+               else  if(strpos($line,'Content-Transfer-Encoding:')!==false)
+               {
+                 $line_1 = substr($line,strpos($line,'Content-Transfer-Encoding:')+26);
+                  if(strpos(trim($line_1),'quoted-printable')===false){ 
+                     $tmp['file_encoding'] = trim($line_1); //echo trim($line_2);
+                     $line_0 =2;
+                   } //Cancels the 'quoted-printable' test
+               }   
+               break;
 
+             case 2:
+               $line_2 = $line; //echo $line_2.'<br/>';
+               if(strpos($line,'Content-Disposition:')!==false)
+               {
+                 $line_2 = substr($line,strpos($line,'Content-Disposition:')+20);
+                 $line_2 = explode(";",$line_2); 
+                    if(trim($line_2[1])=='') //if there is a space between content-disposition and filename
+                       $line_7=1; 
+                   $tmp['file_d_type'] = trim($line_2[0]); //echo trim($line_2[0]);
+                   $line_2 = substr($line_2[1],strpos($line_2[1],'filename=')+9);
+                   $tmp['file_name'] = preg_replace("/\"/","",$line_2); //echo $line_2;
+                   $line_0 = 3;
+                
+               }
+               else  if(strpos($line,'Content-Transfer-Encoding:')!==false)
+               {
+                 $line_2 = substr($line,strpos($line,'Content-Transfer-Encoding:')+26);
+                  if(strpos(trim($line_2),'quoted-printable')===false){ 
+                     $tmp['file_encoding'] = trim($line_2); //echo  trim($line_2);
+                     $line_0 = 3;
+                   } //Cancels the 'quoted-printable' test
+               }
+               else  if(strpos($line,'Content-Type:')!==false )
+               {
+                 $line_2 = substr($line,strpos($line,'Content-Type:')+13);
+                 $line_2 = explode(";",$line_2);
+                 if(strpos(trim($line_2[0]),'multipart/alternative')===false){ 
+                    $tmp['file_type'] = trim($line_2[0]);
+                    //echo trim($line_1[0]);
+                     $line_0 = 3;
+                 }//cancels the 'multipart/alternative' test
+               } 
+               break;
+
+             case 3:
+               $line_3 = $line; //echo $line_3.'<br/>';
+               if(strpos($line,'Content-Transfer-Encoding:')!==false)
+               {
+                 $line_3 = substr($line,strpos($line,'Content-Transfer-Encoding:')+26);
+                 if(strpos(trim($line_3),'quoted-printable')===false){ 
+                    $tmp['file_encoding'] = trim($line_3); //echo  trim($line_3);
+                 
+                     $line_4 = 1;
+                     $line_0 = 4;
+                   } //Cancels the 'quoted-printable' test 
+               }
+               else if(strpos($line,'Content-Disposition:')!==false)
+               {
+                 $line_3 = substr($line,strpos($line,'Content-Disposition:')+20);
+                 $line_3 = explode(";",$line_3); 
+                     if(trim($line_3[1])=='') //if there is a space between content-disposition and filename
+                       $line_7=1; 
+                    $tmp['file_d_type'] = trim($line_3[0]); //echo trim($line_3[0]);
+                    $line_3 = substr($line_3[1],strpos($line_3[1],'filename=')+9);
+                    $tmp['file_name'] = preg_replace("/\"/","",$line_3); //echo $line_3;
+                    $line_4 = 1;
+                    $line_0 = 4;
+                 
+               } 
+               else  if(strpos($line,'Content-Type:')!==false )
+               {
+                 $line_3 = substr($line,strpos($line,'Content-Type:')+13);
+                 $line_3 = explode(";",$line_3);
+                 if(strpos(trim($line_3[0]),'multipart/alternative')===false){ 
+                    $tmp['file_type'] = trim($line_3[0]);
+                    //echo trim($line_1[0]);
+                     $line_4 = 1;
+                     $line_0 = 4;
+                 }//cancels the 'multipart/alternative' test
+               } 
+               break;
+             case 4:
+              if(trim($line)=='')
+              {
+                $line_0 = 5;
+                $line_6 = '';
+              }
+              break;
+              
+             case 5:
+              $line_6.=$line;
+             break;
+             
+            }
+
+          }
+
+        } //end of for each
+
+       //print_r($this->attachments); 
+        
+    }
     private function extractHeadersAndRawBody()
     {
         $lines = preg_split("/(\r?\n|\r)/", $this->emailRawContent);
-
+        //echo $this->emailRawContent.'<hr/>';
         $currentHeader = '';
 
         $i = 0;
         foreach ($lines as $line)
         {
+            //echo $line.'<br/>';
             if(self::isNewLine($line))
             {
                 // end of headers
@@ -153,6 +390,32 @@ class PlancakeEmailParser {
         }
 
         return explode(',', $this->rawFields['cc']);
+    }
+    /**
+     *
+     * @return array
+     */
+    public function getFrom()
+    {
+       
+    $email = trim($this->rawFields['from']);
+
+     if(substr($email, -1) == '>'){
+        $fromarr = explode("<",$email);
+        $mailarr1 = explode(">",$fromarr[1]);
+        $email = $mailarr1[0];
+     }
+
+    return $email;
+
+    }
+    /**
+     *
+     * @return array
+     */
+    public function getAllRaw()
+    {
+      print_r($this->rawFields);
     }
 
     /**
