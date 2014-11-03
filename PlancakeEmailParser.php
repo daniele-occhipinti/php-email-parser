@@ -335,4 +335,3 @@ class PlancakeEmailParser {
         return preg_match('/^[A-Za-z]/', $line);
     }
 }
-?>
