@@ -99,11 +99,12 @@ class PlancakeEmailParser {
             
             if ($this->isLineStartingWithPrintableChar($line)) // start of new header
             {
-                preg_match('/([^:]+): ?(.*)$/', $line, $matches);
-                $newHeader = strtolower($matches[1]);
-                $value = $matches[2];
-                $this->rawFields[$newHeader] = $value;
-                $currentHeader = $newHeader;
+                if(preg_match('/([^:]+): ?(.*)$/', $line, $matches) ) {
+	                $newHeader = strtolower($matches[1]);
+	                $value = $matches[2];
+	                $this->rawFields[$newHeader] = $value;
+	                $currentHeader = $newHeader;
+                }
             }
             else // more lines related to the current header
             {
