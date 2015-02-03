@@ -207,7 +207,7 @@ class PlancakeEmailParser {
         $boundaries = $matches[1];
         // sometimes boundaries are delimited by quotes - we want to remove them
         foreach($boundaries as $i => $v) {
-            $boundaries[$i] = str_replace(array("'", '"'), '', $v);
+            $boundaries[$i] = trim(str_replace(array("'", '"'), '', $v));
         }
         
         foreach ($this->rawBodyLines as $line) {
