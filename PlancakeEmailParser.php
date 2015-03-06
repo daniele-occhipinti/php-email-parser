@@ -334,5 +334,62 @@ class PlancakeEmailParser {
     {
         return preg_match('/^[A-Za-z]/', $line);
     }
+
+    /**
+    * Get all attachments and return them as a base64 encoded array
+    *
+    * @return array
+    */
+    public function getAttachments()
+    {
+        $body = '';
+        $allFiles = [];
+        $detectedContentType = false;
+        $detectedFilename = "";
+        $waitingForContentStart = true;
+
+        $contentTypeRegex = '/^Content-Disposition: ?attachment/i';
+
+        // there could be more than one boundary
+        preg_match_all('!boundary=(.*)$!mi', $this->emailRawContent, $matches);
+
+        $boundaries = $matches[1];
+        // sometimes boundaries are delimited by quotes - we want to remove them
+        foreach ($boundaries as $i => $v) {
+            $boundaries[$i] = str_replace(array("'", '"'), '', $v);
+        }
+
+        foreach ($this->rawBodyLines as $line) {
+            if (preg_match('/filename=\"(.*)\"/', $line, $matches)) {
+                $detectedFilename = $matches[1];
+            }
+
+            if (!$detectedContentType) {
+
+                if (preg_match($contentTypeRegex, $line, $matches)) {
+                    $detectedContentType = true;
+
+                }
+
+            } else if ($detectedContentType && $waitingForContentStart) {
+                if (self::isNewLine($line)) {
+                    $waitingForContentStart = false;
+                }
+            } else {
+                if (is_array($boundaries)) {
+                    if (in_array(str_replace('-', '', $line), $boundaries)) {  // found the delimiter
+                        $allFiles[$detectedFilename] = $body;
+                        $detectedFilename = "";
+                        $body = "";
+                        $waitingForContentStart = true;
+                        continue;
+                    }
+                }
+                $body .= $line . "\n";
+            }
+        }
+
+        return $allFiles;
+    }
 }
 ?>
