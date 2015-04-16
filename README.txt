@@ -20,6 +20,8 @@ $emailDeliveredToHeader = $emailParser->getHeader('Delivered-To');
 
 $emailBody = $emailParser->getPlainBody();
 
+$emailAttachments = $emailParser->getAttachments();
+
 For more info:
 https://github.com/plancake/official-library-php-email-parser
 
