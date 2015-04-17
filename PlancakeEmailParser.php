@@ -169,6 +169,26 @@ class PlancakeEmailParser {
         return explode(',', $this->rawFields['to']);
     }
 
+
+	/**
+	 * @return string
+	 */
+	function getFrom()
+    {
+
+	    $email = trim($this->rawFields['from'],' >');
+
+	    if(strpos($email,'<') !== false)
+	    {
+		   list($junk,$address) = explode("<",$email);
+		   return $address;
+	    }
+
+	    return $email;
+    }
+
+
+
     /**
      * return string - UTF8 encoded
      * 
@@ -292,8 +312,97 @@ class PlancakeEmailParser {
      */
     public function getHTMLBody()
     {
-        return $this->getBody(self::HTML);
+	    $body = $this->getBody(self::HTML);
+
+        $tmp = explode("</html>",$body);
+        return $tmp[0]."</html>"; // omit any trailing data.
+
+//	    return $body;
     }
+
+
+	/**
+	 * Detect and return an array of attachments and their data.
+	 * @return array|bool
+	 */
+	public function getAttachments()
+	{
+
+		if(preg_match('/multipart\/mixed;\s*?boundary=(.*)/i', $this->rawFields['content-type'], $match))
+		{
+			$boundary = trim($match[1],'"'); // Thunderbird uses quotes, apple mail doesn't.
+
+			$parts = explode($boundary, $this->emailRawContent);
+
+			$attach = array();
+
+			foreach($parts as $part)
+			{
+				if($data =  $this->processParts($part))
+				{
+					$attach[] = $data;
+				}
+			}
+
+			return $attach;
+		}
+
+		return false;
+
+	}
+
+
+	/**
+	 * Process a single attachment.
+	 * @param $part
+	 * @return array|bool
+	 */
+	private function processParts($part)
+	{
+		if(empty($part) || ($part == '--'))
+		{
+			return false;
+		}
+
+		list($head,$attach) = explode("\n\n",$part,2);
+
+		$ret = array();
+
+		$repl = array('filename=', '"');
+
+		$h = explode("\n",$head);
+
+		foreach($h as $line)
+		{
+			$line = trim($line);
+			if(strpos($line, ': ')!==false)
+			{
+				list($key,$val) = explode(': ',$line,2);
+				list($value,$junk) = explode(";",$val);
+				$key = strtolower($key);
+				$ret[$key] = rtrim($value,"\n\t\r;");
+			}
+			elseif(strpos($line, 'filename=')!==false)
+			{
+				$ret['filename'] = str_replace($repl, '', $line); // clean up without using regexp.
+			}
+
+		}
+
+
+		if(!empty($ret['content-type']) && ($ret['content-disposition'] == 'inline' || $ret['content-disposition'] == 'attachment'))
+		{
+			$ret['content'] = trim($attach);
+			$ret['content'] = rtrim($ret['content'],'-\n');
+
+			return $ret;
+		}
+
+
+		return false;
+
+	}
+
 
     /**
      * N.B.: if the header doesn't exist an empty string is returned
