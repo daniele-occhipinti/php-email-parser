@@ -55,13 +55,6 @@ class PlancakeEmailParser {
      */
     private $emailRawContent;
 
-
-	/**
-	 *
-	 * @var string
-	 */
-    private $rawBodyContent;
-
     /**
      *
      * @var associative array
@@ -176,6 +169,26 @@ class PlancakeEmailParser {
         return explode(',', $this->rawFields['to']);
     }
 
+
+	/**
+	 * @return string
+	 */
+	function getFrom()
+    {
+
+	    $email = trim($this->rawFields['from'],' >');
+
+	    if(strpos($email,'<') !== false)
+	    {
+		   list($junk,$address) = explode("<",$email);
+		   return $address;
+	    }
+
+	    return $email;
+    }
+
+
+
     /**
      * return string - UTF8 encoded
      * 
@@ -282,12 +295,6 @@ class PlancakeEmailParser {
             }
         }
 
-		if($returnType == self::HTML) // prevent doing the same job twice.
-		{
-			$this->rawBodyContent = $body;
-		}
-
-
         return $body;
     }
 
@@ -308,7 +315,7 @@ class PlancakeEmailParser {
 	    $body = $this->getBody(self::HTML);
 
         $tmp = explode("</html>",$body);
-        return $tmp[0]."</html>"; // omit any attachments.
+        return $tmp[0]."</html>"; // omit any trailing data.
 
 //	    return $body;
     }
@@ -325,12 +332,7 @@ class PlancakeEmailParser {
 		{
 			$boundary = trim($match[1],'"'); // Thunderbird uses quotes, apple mail doesn't.
 
-			if(empty($this->rawBodyContent))
-			{
-				$this->rawBodyContent = $this->getBody(self::HTML, true);
-			}
-
-			$parts = explode($boundary, $this->rawBodyContent);
+			$parts = explode($boundary, $this->emailRawContent);
 
 			$attach = array();
 
@@ -344,7 +346,6 @@ class PlancakeEmailParser {
 
 			return $attach;
 		}
-
 
 		return false;
 
