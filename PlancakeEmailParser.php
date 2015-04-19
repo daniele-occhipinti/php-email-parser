@@ -338,20 +338,20 @@ class PlancakeEmailParser
      *
      * Example of an email body
      *
-        --0016e65b5ec22721580487cb20fd
-        Content-Type: text/plain; charset=ISO-8859-1
-
-        Hi all. I am new to Android development.
-        Please help me.
-
-        --
-        My signature
-
-        email: myemail@gmail.com
-        web: http://www.example.com
-
-        --0016e65b5ec22721580487cb20fd
-        Content-Type: text/html; charset=ISO-8859-1
+     *  --0016e65b5ec22721580487cb20fd
+     *  Content-Type: text/plain; charset=ISO-8859-1
+     *
+     *  Hi all. I am new to Android development.
+     *  Please help me.
+     *
+     *  --
+     *  My signature
+     *
+     *  email: myemail@gmail.com
+     *  web: http://www.example.com
+     *
+     *  --0016e65b5ec22721580487cb20fd
+     *  Content-Type: text/html; charset=ISO-8859-1
      */
     public function getBody($returnType = self::PLAINTEXT)
     {
