@@ -1,7 +1,7 @@
 {
-    "name": "Plancake/EmailParser",
+    "name": "djmattyg007/emailparser",
     "type": "library",
-    "description": "Plancake Email Parser is a simple emailparser for php",
+    "description": "Fork of the Plancake Email Parser with additional features",
     "keywords": ["email", "parser"],
     "homepage": "http://www.plancake.com",
     "version": "1.0.0",
@@ -10,6 +10,10 @@
         {
             "name": "Daniele Occhipinti",
             "email": "dan@plancake.com"
+        },
+        {
+            "name": "Matthew Gamble",
+            "email": "git@matthewgamble.net"
         }
     ],
     "require": {

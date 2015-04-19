@@ -1,5 +1,11 @@
 *** PLANCAKE PHP EMAIL PARSER ***
 
+This is a fork of the original Plancake email parser, with various pull
+requests submitted to the original repository merged in, as well as other
+additional features.
+
+The original readme is below.
+
 N.B.: if you deal with non-English languages, we recommend you install the IMAP PHP extension:
 the Plancake PHP Email Parser will detect it and used it automatically for better results.
 
