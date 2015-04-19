@@ -74,6 +74,14 @@ class PlancakeEmailParser {
      * @var array
      */
     protected $singleHeaders = array(
+        "orig-date",
+        "sender",
+        "reply-to",
+        "to",
+        "cc",
+        "bcc",
+        "message-id",
+        "in-reply-to",
         "subject",
     );
 
