@@ -68,6 +68,16 @@ class PlancakeEmailParser {
     protected $rawBodyLines;
 
     /**
+     * Headers that should always replace a previous header of the same type,
+     * rather than be combined into an array.
+     *
+     * @var array
+     */
+    protected $singleHeaders = array(
+        "subject",
+    );
+
+    /**
      *
      * @param string $emailRawContent
      */
@@ -106,7 +116,7 @@ class PlancakeEmailParser {
                 }
                 $newHeader = strtolower($matches[1]);
                 $value = $matches[2];
-                if (isset($this->rawFields[$newHeader])) {
+                if (isset($this->rawFields[$newHeader]) && !in_array($newHeader)) {
                     if (is_array($this->rawFields[$newHeader])) {
                         $this->rawFields[$newHeader][] = $value;
                     } else {
