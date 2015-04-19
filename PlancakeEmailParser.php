@@ -334,6 +334,18 @@ class PlancakeEmailParser
     }
 
     /**
+     * @return array
+     */
+    public function getFrom()
+    {
+        if (!isset($this->rawFields['from'])) {
+            return array();
+        }
+
+        return $this->tokeniseUserField(implode(", ", $this->rawFields['from']));
+    }
+
+    /**
      * return string - UTF8 encoded
      *
      * Example of an email body
