@@ -54,6 +54,11 @@ class PlancakeEmailParser
     protected $emailRawContent;
 
     /**
+     * @var bool
+     */
+    protected $debug = false;
+
+    /**
      * @var array
      */
     protected $rawFields;
@@ -83,15 +88,27 @@ class PlancakeEmailParser
 
     /**
      * @param string $emailRawContent
+     * @param bool $debug
      */
-    public function __construct($emailRawContent)
+    public function __construct($emailRawContent, $debug = false)
     {
         $this->emailRawContent = $emailRawContent;
+        $this->debug = $debug;
 
         $this->extractHeadersAndRawBody();
 
         if (function_exists('imap_open')) {
             $this->isImapExtensionAvailable = true;
+        }
+    }
+
+    /**
+     * @param string $message
+     */
+    protected function debug($message)
+    {
+        if ($this->debug === true) {
+            var_dump($message);
         }
     }
 
