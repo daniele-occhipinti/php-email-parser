@@ -443,7 +443,7 @@ class PlancakeEmailParser
             $bodyCopy = $body;
             $body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 
-            if ($body === FALSE) { // iconv returns FALSE on failure
+            if ($body === false) { // iconv returns false on failure
                 $body = utf8_encode($bodyCopy);
             }
         }
