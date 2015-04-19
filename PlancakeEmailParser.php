@@ -102,21 +102,25 @@ class PlancakeEmailParser {
                 preg_match('/([^:]+): ?(.*)$/', $line, $matches);
                 $newHeader = strtolower($matches[1]);
                 $value = $matches[2];
-		        if (is_array($this->rawFields[$newHeader]))
-                    $this->rawFields[$newHeader][] = $value;
-                else if (isset($this->rawFields[$newHeader]))
-                    $this->rawFields[$newHeader] = array($this->rawFields[$newHeader], $value);
-                else
+                if (isset($this->rawFields[$newHeader])) {
+                    if (is_array($this->rawFields[$newHeader])) {
+                        $this->rawFields[$newHeader][] = $value;
+                    } else {
+                        $this->rawFields[$newHeader] = array($this->rawFields[$newHeader], $value);
+                    }
+                } else {
                     $this->rawFields[$newHeader] = $value;
+                }
                 $currentHeader = $newHeader;
             }
             else // more lines related to the current header
             {
                 if ($currentHeader) { // to prevent notice from empty lines
+                    $withoutIndent = preg_replace("/^\s+/", "", $line);
         			if (is_array($this->rawFields[$currentHeader])) {
-        				$this->rawFields[$currentHeader][count($this->rawFields[$currentHeader]) - 1] .= substr($line, 1);
+                        $this->rawFields[$currentHeader][count($this->rawFields[$currentHeader]) - 1] .= $withoutIndent;
         			} else {
-                        $this->rawFields[$currentHeader] .= substr($line, 1);
+                        $this->rawFields[$currentHeader] .= $withoutIndent;
         			}
                 }
             }
