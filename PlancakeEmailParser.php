@@ -192,7 +192,137 @@ class PlancakeEmailParser
     }
 
     /**
-     * @return string[]
+     * @param string $userField
+     * @return array
+     */
+    public function tokeniseUserField($userField)
+    {
+        $userField = trim($userField);
+        $userFieldChars = self::strSplitUnicode($userField);
+        $charCount = count($userFieldChars);
+        $return = array();
+        $curName = "";
+        $curEmail = "";
+        $startChars = array('"' => '"', "<" => ">");
+        $startChar = null;
+        for ($x = 0; $x < $charCount; $x++) {
+            $this->debug("start iteration");
+            $this->debug(implode("", array_slice($userFieldChars, $x)));
+            if (strlen($curName) === 0 && isset($startChars[$userFieldChars[$x]])) {
+                // If we haven't started processing a name yet, and the name starts with one
+                // of the denoted "start characters", make a note of which character was used
+                // to start the name, then move onto the next character.
+                $this->debug("start mark {$userFieldChars[$x]}");
+                $startChar = $startChars[$userFieldChars[$x]];
+            } elseif (strlen($curName) === 0 || $startChar !== null) {
+                $this->debug("start name");
+                $y = $x;
+                while (true) {
+                    $curName .= $userFieldChars[$y];
+                    $y++;
+                    if ($y >= $charCount) {
+                        break;
+                    }
+                    if ($startChar !== null) {
+                        // If $startChar is set, it means we need to keep going until
+                        // we find the matching end character. The point of this is to
+                        // not break on things like commas and spaces, because the name
+                        // has probably been quoted so that we don't break on commas
+                        // and spaces.
+                        if ($userFieldChars[$y] === $startChar) {
+                            $y++;
+                            break;
+                        }
+                    } else {
+                        if ($userFieldChars[$y] === " " ||
+                            $userFieldChars[$y] === ",") {
+                            // If we hit a space, it means we're processing a name, and
+                            // we're about to move onto the actual email address. If we
+                            // hit a comma, it means we're processing an email address,
+                            // and we're about to move onto the next entry in the list.
+                            break;
+                        }
+                    }
+                }
+                $x = $y;
+                $startChar = null;
+            } elseif (strlen($curName) &&
+                $userFieldChars[$x] === " " &&
+                $userFieldChars[$x + 1] === "<") {
+                // We just had a name delimieted by quotes, and now we're about to move
+                // onto the actual email address.
+                $this->debug("found opening bracket after a space");
+                $x++;
+            } elseif (strlen($curName) &&
+                $userFieldChars[$x] === "<") {
+                // We just had a name not delimieted by quotes, and now we're about to
+                // move onto the actual email address.
+                $this->debug("found opening bracket");
+            } else {
+                // We had a name before the actual email address. We're now grabbing the
+                // actual email address.
+                $this->debug("start email");
+                $y = $x;
+                while ($userFieldChars[$y] !== ">") {
+                    $curEmail .= $userFieldChars[$y];
+                    $y++;
+                }
+                $x = $y;
+                $return[] = array(
+                    "name" => $curName,
+                    "email" => $curEmail,
+                );
+                $curName = "";
+                $this->debug($return);
+            }
+            if (strlen($curName)) {
+                $this->debug(implode("", array_slice($userFieldChars, $x)));
+                if ($x >= $charCount || $userFieldChars[$x] === ",") {
+                    // We had a "name" that was actually an email address with no name.
+                    $this->debug("we have an email address with no name");
+                    $return[] = array(
+                        "name" => "",
+                        "email" => $curName,
+                    );
+                    $curEmail = $curName;
+                    $curName = "";
+                }
+            }
+            if (strlen($curEmail)) {
+                // We've found and saved an email address. This must signal the end
+                // of an item in the list. Reset, and move to the start of the next
+                // item (or the end of the list)
+                $this->debug("we have an email, reset");
+                $curEmail = "";
+                $this->debug(implode("", array_slice($userFieldChars, $x)));
+                while ($x < $charCount && $userFieldChars[$x] !== ",") {
+                    $x++;
+                }
+                $this->debug(implode("", array_slice($userFieldChars, $x)));
+                while ($x < $charCount && $userFieldChars[$x] === " ") {
+                    $x++;
+                }
+                $x++;
+            }
+        }
+        $this->debug(implode("", array_slice($userFieldChars, $x)));
+        return $return;
+    }
+
+    /**
+     * @return array
+     * @throws Exception If no to header was found in the raw message
+     */
+    public function getTo()
+    {
+        if (empty($this->rawFields['to'])) {
+            throw new Exception("Couldn't find the recipients of the email");
+        }
+        return $this->tokeniseUserField($this->rawFields['to']);
+    }
+
+    /**
+     * @return array
      */
     public function getCc()
     {
@@ -200,20 +330,7 @@ class PlancakeEmailParser
             return array();
         }
 
-        return explode(',', $this->rawFields['cc']);
-    }
-
-    /**
-     *
-     * @return string[]
-     * @throws Exception if a to header is not found or if there are no recipient
-     */
-    public function getTo()
-    {
-        if (empty($this->rawFields['to'])) {
-            throw new Exception("Couldn't find the recipients of the email");
-        }
-        return explode(',', $this->rawFields['to']);
+        return $this->tokeniseUserField($this->rawFields['cc']);
     }
 
     /**
@@ -371,5 +488,19 @@ class PlancakeEmailParser
     private function isLineStartingWithPrintableChar($line)
     {
         return preg_match('/^[A-Za-z]/', $line);
+    }
+
+    /**
+     * @param string $string
+     * @return string[]
+     */
+    protected static function strSplitUnicode($string)
+    {
+        $return = array();
+        $len = mb_strlen($string, "UTF-8");
+        for ($i = 0; $i < $len; $i++) {
+            $return[] = mb_substr($string, $i, 1, "UTF-8");
+        }
+        return $return;
     }
 }
