@@ -7,7 +7,7 @@
 *                                                                                    *
 * Copyright 2009-2010-2011 by:     Danyuki Software Limited                          *
 * Support, News, Updates at:  http://www.plancake.com                                *
-* Licensed under the LGPL version 3 license.                                         *                                                       *
+* Licensed under the LGPL version 3 license.                                         *
 * Danyuki Software Limited is registered in England and Wales (Company No. 07554549) *
 **************************************************************************************
 * Plancake is distributed in the hope that it will be useful,                        *
