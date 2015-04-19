@@ -315,7 +315,7 @@ class PlancakeEmailParser
      */
     public function getTo()
     {
-        if (empty($this->rawFields['to'])) {
+        if (!isset($this->rawFields['to'])) {
             throw new Exception("Couldn't find the recipients of the email");
         }
         return $this->tokeniseUserField($this->rawFields['to']);
