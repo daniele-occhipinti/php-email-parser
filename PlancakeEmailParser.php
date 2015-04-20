@@ -342,7 +342,7 @@ class PlancakeEmailParser
             return array();
         }
 
-        return $this->tokeniseUserField(implode(", ", $this->rawFields['from']));
+        return $this->tokeniseUserField($this->rawFields['from']);
     }
 
     /**
