@@ -234,11 +234,15 @@ class PlancakeEmailParser
                             break;
                         }
                     } else {
-                        if ($userFieldChars[$y] === " " ||
-                            $userFieldChars[$y] === ",") {
-                            // If we hit a space, it means we're processing a name, and
-                            // we're about to move onto the actual email address. If we
-                            // hit a comma, it means we're processing an email address,
+                        if ($userFieldChars[$y] === " ") {
+                            if (isset($userFieldChars[$y + 1]) && $userFieldChars[$y + 1] === "<") {
+                                // If we hit a space, and it's followed immediately by left
+                                // bracket, it means we're processing a name, and we're about
+                                // to move onto the actual email address.
+                                break;
+                            }
+                        } elseif ($userFieldChars[$y] === ",") {
+                            // If we hit a comma, it means we're processing an email address,
                             // and we're about to move onto the next entry in the list.
                             break;
                         }
