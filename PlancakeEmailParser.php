@@ -339,6 +339,18 @@ class PlancakeEmailParser
     /**
      * @return array
      */
+    public function getBcc()
+    {
+        if (!isset($this->rawFields['bcc'])) {
+            return array();
+        }
+
+        return $this->tokeniseUserField($this->rawFields['bcc']);
+    }
+
+    /**
+     * @return array
+     */
     public function getFrom()
     {
         if (!isset($this->rawFields['from'])) {
