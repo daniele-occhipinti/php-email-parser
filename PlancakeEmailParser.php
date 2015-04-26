@@ -350,6 +350,23 @@ class PlancakeEmailParser
     }
 
     /**
+     * @return array
+     */
+    public function getSender()
+    {
+        if (!isset($this->rawFields['sender'])) {
+            return array();
+        }
+
+        $sender = $this->tokeniseUserField($this->rawFields['sender']);
+        if (isset($sender[0])) {
+            return $sender[0];
+        } else {
+            return array();
+        }
+    }
+
+    /**
      * return string - UTF8 encoded
      *
      * Example of an email body
