@@ -315,12 +315,11 @@ class PlancakeEmailParser
 
     /**
      * @return array
-     * @throws Exception If no to header was found in the raw message
      */
     public function getTo()
     {
         if (!isset($this->rawFields['to'])) {
-            throw new Exception("Couldn't find the recipients of the email");
+            return array();
         }
         return $this->tokeniseUserField($this->rawFields['to']);
     }
