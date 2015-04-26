@@ -4,7 +4,6 @@
     "description": "Fork of the Plancake Email Parser with additional features",
     "keywords": ["email", "parser"],
     "homepage": "http://www.plancake.com",
-    "version": "2.0.0",
     "license": "GPLv3",
     "authors": [
         {
