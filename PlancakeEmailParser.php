@@ -154,6 +154,20 @@ class PlancakeEmailParser {
 
         return explode(',', $this->rawFields['cc']);
     }
+    
+    /**
+     *
+     * @return array
+     * @throws Exception if a to header is not found or if there are no recipient
+     */
+    public function getFrom()
+    {
+        if ( (!isset($this->rawFields['from'])) || (!count($this->rawFields['from'])))
+        {
+            throw new Exception("Couldn't find the recipients of the email");
+        }
+        return explode(',', $this->rawFields['from']);
+    }
 
     /**
      *
