@@ -15,6 +15,7 @@ $emailParser = new PlancakeEmailParser(file_get_contents($emailPath));
 $emailTo = $emailParser->getTo();
 $emailSubject = $emailParser->getSubject();
 $emailCc = $emailParser->getCc();
+$emailFrom = $emailParser->getFrom();
 // ... or you can use the 'general purpose' method getHeader()
 $emailDeliveredToHeader = $emailParser->getHeader('Delivered-To');
 
