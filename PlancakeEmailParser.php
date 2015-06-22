@@ -143,6 +143,31 @@ class PlancakeEmailParser {
 
     /**
      *
+     * @return string (in UTF-8 format)
+     * @throws Exception if a subject header is not found
+     */
+    public function getFrom()
+    {
+        if (!isset($this->rawFields['from']))
+        {
+            throw new Exception("Couldn't find the sender of the email");
+        }
+        
+        $ret = '';
+        
+        if ($this->isImapExtensionAvailable) {
+            foreach (imap_mime_header_decode($this->rawFields['from']) as $h) { // subject can span into several lines
+                $charset = ($h->charset == 'default') ? 'US-ASCII' : $h->charset;
+                $ret .=  iconv($charset, "UTF-8//TRANSLIT", $h->text);
+            }
+        } else {
+            $ret = utf8_encode(iconv_mime_decode($this->rawFields['from']));
+        }
+        
+        return $ret;
+    }
+    /**
+     *
      * @return array
      */
     public function getCc()
