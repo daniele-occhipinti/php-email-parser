@@ -467,6 +467,7 @@ class PlancakeEmailParser
             $body = quoted_printable_decode($body);
         }
 
+		/*
         if ($charset != 'UTF-8') {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
@@ -479,6 +480,7 @@ class PlancakeEmailParser
                 $body = utf8_encode($bodyCopy);
             }
         }
+        */
 
         return $body;
     }
