@@ -1,19 +1,18 @@
-*** PLANCAKE PHP EMAIL PARSER ***
-
-This is a fork of the original Plancake email parser, with various pull
+#PLANCAKE PHP EMAIL PARSER
+<hr>
+**NOTICE**: This is a fork of the original Plancake email parser, with various pull
 requests submitted to the original repository merged in, as well as other
 additional features.
 
-The original readme is below.
-
+The original readme is below:
+<hr>
 N.B.: if you deal with non-English languages, we recommend you install the IMAP PHP extension:
 the Plancake PHP Email Parser will detect it and used it automatically for better results.
 
 This library allows you to easily parse an email given its content (headers + body).
 
 Usage example:
-
-
+```php
 $emailPath = "/var/mail/spool/dan/new/12323344323234234234";
 $emailParser = new PlancakeEmailParser(file_get_contents($emailPath));
 
@@ -25,9 +24,8 @@ $emailCc = $emailParser->getCc();
 $emailDeliveredToHeader = $emailParser->getHeader('Delivered-To');
 
 $emailBody = $emailParser->getPlainBody();
-
-For more info:
-https://github.com/plancake/official-library-php-email-parser
+```
+For more info: https://github.com/plancake/official-library-php-email-parser
 
 -----------------------------------------
 
@@ -41,12 +39,12 @@ http://www.plancake.com/contact
 Please consider contributing with bug fixes or improvements:
 dan@plancake.com
 
-Plancake homepage: http://www.plancake.com
-Support: http://www.plancake.com/forums/forum/13/support-for-developers/
-Subscribe to our blog: http://www.plancake.com/blog
-Follow us on Twitter: http://twitter.com/plancakebakers
-Follow us on Facebook: http://www.facebook.com/plancake
-Donations ♥ : http://www.plancake.com/donate
+- Plancake homepage: http://www.plancake.com
+- Support: http://www.plancake.com/forums/forum/13/support-for-developers/
+- Subscribe to our blog: http://www.plancake.com/blog
+- Follow us on Twitter: http://twitter.com/plancakebakers
+- Follow us on Facebook: http://www.facebook.com/plancake
+- Donations ♥ : http://www.plancake.com/donate
 
 "Plancake" and "Plancake Team" are trademarks of Daniele Occhipinti.
 (by the way, what about using Plancake Team for team collaboration? team.plancake.com)
@@ -58,6 +56,6 @@ Brought to you by Danyuki Software Limited, a startup tech company based in Lond
 Happy plancaking!
 
 Daniele Occhipinti
-Director and Founder of Plancake
-email: dan@plancake.com
-skype: dan_plan (I can speak English and Italian)
+  - Director and Founder of Plancake
+  - email: dan@plancake.com
+  - skype: dan_plan (I can speak English and Italian)
