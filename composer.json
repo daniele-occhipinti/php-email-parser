@@ -1,19 +1,25 @@
 {
-    "name": "Plancake/EmailParser",
+    "name": "djmattyg007/emailparser",
     "type": "library",
-    "description": "Plancake Email Parser is a simple emailparser for php",
+    "description": "Fork of the Plancake Email Parser with additional features",
     "keywords": ["email", "parser"],
     "homepage": "http://www.plancake.com",
-    "version": "1.0.0",
     "license": "GPLv3",
     "authors": [
         {
             "name": "Daniele Occhipinti",
             "email": "dan@plancake.com"
+        },
+        {
+            "name": "Matthew Gamble",
+            "email": "git@matthewgamble.net"
         }
     ],
     "require": {
         "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "~2.3"
     },
     "autoload": {
         "psr-0": { "PlancakeEmailParser": "." }

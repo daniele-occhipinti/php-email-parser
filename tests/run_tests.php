@@ -3,16 +3,25 @@
 // run this as:
 // php run_tests.php
 
-require_once("../PlancakeEmailParser.php");
+function printBarrier()
+{
+    echo "\r\n\r\n\r\n";
+}
+function printnl($message)
+{
+    echo "$message\r\n";
+}
 
-$emails = glob('./emails/*');
+require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . "PlancakeEmailParser.php");
 
-echo "\r\n\r\n\r\n";
+$emails = glob(__DIR__ . DIRECTORY_SEPARATOR . "emails" . DIRECTORY_SEPARATOR . "*");
 
-foreach($emails as $email) {
-	echo "Email $email \r\n";
-	$emailParser = new PlancakeEmailParser(file_get_contents($email));
-	echo "subject: " . $emailParser->getSubject() . "\r\n";
-	echo "body: " . $emailParser->getBody() . "\r\n";
-	echo "\r\n\r\n\r\n";
+printBarrier();
+
+foreach ($emails as $email) {
+    printnl("Email $email");
+    $emailParser = new PlancakeEmailParser(file_get_contents($email));
+    printnl("subject: " . $emailParser->getSubject());
+    printnl("body: " . $emailParser->getBody());
+    printBarrier();
 }
