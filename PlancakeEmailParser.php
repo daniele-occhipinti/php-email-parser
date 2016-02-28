@@ -412,11 +412,20 @@ class PlancakeEmailParser
         }
 
         // there could be more than one boundary
-        preg_match_all('!boundary=(.*)$!mi', $this->emailRawContent, $matches);
-        $boundaries = $matches[1];
+        preg_match_all(
+            '!boundary=(.*)$!mi',
+            $this->emailRawContent,
+            $matches
+        );
+        $boundaries_original = $matches[1];
+        $boundaries = [ ];
         // sometimes boundaries are delimited by quotes - we want to remove them
-        foreach ($boundaries as $i => $v) {
-            $boundaries[$i] = str_replace(array("'", '"'), '', $v);
+        // add duplicates of boundary one with '--' at the beginning
+        // and one with '--' at both start and end. so we can match
+        foreach ($boundaries_original as $i => $v) {
+            $bound = str_replace(array("'", '"' ), '', $v);
+            $boundaries[] = '--' . $bound;
+            $boundaries[] = '--' . $bound . '--';
         }
 
         foreach ($this->rawBodyLines as $line) {
@@ -428,7 +437,7 @@ class PlancakeEmailParser
                 if (preg_match('/charset=(.*)/i', $line, $matches)) {
                     $charset = strtoupper(trim($matches[1], '"'));
                 }
-            } else if ($detectedContentType && $waitingForContentStart) {
+            } elseif ($detectedContentType && $waitingForContentStart) {
                 if (preg_match('/charset=(.*)/i', $line, $matches)) {
                     $charset = strtoupper(trim($matches[1], '"'));
                 }
@@ -442,9 +451,11 @@ class PlancakeEmailParser
                 }
             } else {  // ($detectedContentType && !$waitingForContentStart)
                 // collecting the actual content until we find the delimiter
-                // if the delimited is AAAAA, the line will be --AAAAA  - that's why we use substr
+                // if the delimiter is AAAAA, the line will be --AAAAA or --AAAAA--
+                // - that's why we appended -- at the beginning earlier
+                // with a copy with -- at the beginning and the end
                 if (is_array($boundaries)) {
-                    if (in_array(substr($line, 2), $boundaries)) {  // found the delimiter
+                    if (in_array($line, $boundaries)) {  // found the delimiter
                         break;
                     }
                 }
@@ -463,11 +474,11 @@ class PlancakeEmailParser
 
         if ($contentTransferEncoding == 'base64') {
             $body = base64_decode($body);
-        } else if ($contentTransferEncoding == 'quoted-printable') {
+        } elseif ($contentTransferEncoding == 'quoted-printable') {
             $body = quoted_printable_decode($body);
         }
 
-		/*
+        /*
         if ($charset != 'UTF-8') {
             // FORMAT=FLOWED, despite being popular in emails, it is not
             // supported by iconv
