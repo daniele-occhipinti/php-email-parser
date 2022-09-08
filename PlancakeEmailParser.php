@@ -168,6 +168,18 @@ class PlancakeEmailParser {
         }
         return explode(',', $this->rawFields['to']);
     }
+	
+    /**
+     *
+     * @return string|false
+     */
+    public function getFromEmail()
+    {
+        $from = self::getHeader("From");
+        $pattern = '/<(.*?)>/s';
+        preg_match($pattern, $from, $matches);
+        return (count($matches) == 2) ? $matches[1] : false;
+    }
 
     /**
      * return string - UTF8 encoded
