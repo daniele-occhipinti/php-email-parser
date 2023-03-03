@@ -43,6 +43,10 @@ class PlancakeEmailParser {
     const PLAINTEXT = 1;
     const HTML = 2;
 
+    const FROM = 0;
+    const FROMNAME = 1;
+    const FROMADDRESS = 2;
+
     /**
      *
      * @var boolean
@@ -333,6 +337,42 @@ class PlancakeEmailParser {
     private function isLineStartingWithPrintableChar($line)
     {
         return preg_match('/^[A-Za-z]/', $line);
+    }
+
+    /**
+     *
+     * @return string
+     * @throws Exception if a to header is not found or if there is no sender
+     */
+    public function getFrom($returnIndex=self::FROM)
+    {
+        if ( (!isset($this->rawFields['from'])) || (!count($this->rawFields['from'])))
+        {
+            throw new Exception("Couldn't find the sender of the email");
+        }
+    	if (!preg_match('/\"([^\"]+)\" <([^>]+)>/', $this->rawFields['from'], $matches)) {
+		(preg_match('/([^<]+) <([^>]+)>/', $this->rawFields['from'], $matches));
+	}
+    }
+
+    /**
+     *
+     * @return string
+     * @throws Exception if a to header is not found or if there is no sender
+     */
+    public function getFromName()
+    {
+        return $this->getFrom(self::FROMNAME);
+    }
+    
+    /**
+     *
+     * @return string
+     * @throws Exception if a to header is not found or if there is no sender
+     */
+    public function getFromAddress()
+    {
+        return $this->getFrom(self::FROMADDRESS);
     }
 }
 ?>
